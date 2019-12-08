@@ -1,0 +1,14 @@
+{
+	"name": "blog_server",
+	"version": "1.0.0",
+	"main": "app.js",
+	"license": "MIT",
+	"scripts": {
+		"dev": "cross-env NODE_ENV=dev nodemon ./bin/www.js",
+		"prd": "cross-env NODE_ENV=production nodemon ./bin/www.js"
+	},
+	"dependencies": {
+		"cross-env": "^6.0.3",
+		"nodemon": "^2.0.1"
+	}
+}
