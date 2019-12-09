@@ -1,48 +1,62 @@
-const getList = (author, keybord) => {
-	return [
-		{
-			id: 1,
-			title: '标题A',
-			content: '内容A',
-			createTime: 1575781422859,
-			author: '哈哈哈'
-		},
-		{
-			id: 2,
-			title: '标题B',
-			content: '内容B',
-			createTime: 1575781470772,
-			author: '呵呵呵'
-		},
-		{
-			id: 3,
-			title: '标题C',
-			content: '内容C',
-			createTime: 1575781497291,
-			author: '啊啊啊'
-		}
-	]
+const { exec } = require('../db/mysql')
+
+const getList = (author, keyword) => {
+	let sql = `select * from blogs where 1=1 `
+	if (author) {
+		sql += `and author='${author}' `
+	}
+	if (keyword) {
+		sql += `and title like '%${keyword}%' `
+	}
+	sql += `order by createtime desc;`
+	return exec(sql)
 }
 
 const getDetail = (id) => {
-	return {
-		content: '这是博客的详细内容'
-	}
+	const sql = `select * from blogs where id='${id}';`
+	return exec(sql).then((rows) => {
+		return rows[0]
+	})
 }
 
 const newBlog = (blogData = {}) => {
-	// blogData 是一个博客对象，包含 title content 属性
-	return {
-		id: 4
-	}
+	const title = blogData.title
+	const content = blogData.content
+	const author = blogData.author
+	const createtime = Date.now()
+	const sql = `insert into blogs (title, content, createtime, author) values('${title}', '${content}', ${createtime}, '${author}');`
+	return exec(sql).then((insertData) => {
+		console.log('insertData is', insertData)
+		return {
+			id: insertData.insertId
+		}
+	})
 }
 
 const updateBlog = (id, blogData = {}) => {
-	return true
+	const title = blogData.title
+	const content = blogData.content
+	const author = blogData.author
+	const sql = `update blogs set title='${title}', content='${content}' where id=${id};`
+	return exec(sql).then((updateData) => {
+		console.log('updateData is ', updateData)
+		if (updateData.affectedRows > 0) {
+			return true
+		} else {
+			return false
+		}
+	})
 }
 
-const delBlog = (id) => {
-	return true
+const delBlog = (id, body) => {
+	const sql = `delete from blogs where id='${id}' and author='${body.author}';`
+	return exec(sql).then((delData) => {
+		if (delData.affectedRows > 0) {
+			return true
+		} else {
+			return false
+		}
+	})
 }
 
 module.exports = {
